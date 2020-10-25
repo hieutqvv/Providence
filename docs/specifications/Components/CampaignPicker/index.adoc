@@ -1,0 +1,35 @@
+= CampaignPicker
+
+== Specifications
+
+- 選択しているキャンペーンは Store の State として宣言され永続化される
+- 選択しているアカウントはコンポーネントの State として宣言され永続化はしない
+- 初回描画時に Store の「選択しているキャンペーン」が属するアカウントを「選択しているアカウント」にする
+- 選択しているアカウントが変わる際、選択しているキャンペーンが属しているアカウントと異なる場合は新しく選択するアカウントに属する最も古いキャンペーンが選択される
+
+== Flow of states propagation
+
+[plantuml]
+--
+start
+if (Is there `me`?) then (Yes)
+  if (Is `account` selected?) then (No)
+    if (Is `campaign` stored?) then (Yes)
+      :Select stored `campaign`;
+    else (No)
+      :Select default `campaign`;
+    endif
+    :Select `account` of `campaign`;
+  else (Yes)
+  endif
+
+  if (Is `campaign` selected?) then (No)
+    :Select first `campaign` of `account`;
+  else (Yes)
+  endif
+
+  :Extract selectable campaigns of selected `account`;
+else (No)
+endif
+end
+--

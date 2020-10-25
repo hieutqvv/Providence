@@ -1,12 +1,17 @@
-import React, { Component } from 'react';
-import { DropdownMenu, DropdownToggle, Nav } from 'reactstrap';
+import React, {Component} from 'react';
+import {DropdownMenu, DropdownToggle, Nav, DropdownItem} from 'reactstrap';
 import PropTypes from 'prop-types';
+import {Link} from 'react-router-dom';
 
-import { AppAsideToggler, AppHeaderDropdown, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
+import {AppHeaderDropdown, AppSidebarToggler} from '@coreui/react';
 
-import logo from '../../assets/img/brand/logo.svg'
-import sygnet from '../../assets/img/brand/sygnet.svg'
-import avatar from '../../assets/img/avatars/6.jpg'
+import {connect} from 'react-redux';
+import md5 from 'js-md5';
+
+import logo from '../../assets/img/brand/logo.svg';
+import {FormattedMessage} from 'react-intl';
+// import sygnet from '../../assets/img/brand/sygnet.svg'
+//import avatar from '../../assets/img/avatars/6.jpg'
 
 const propTypes = {
   children: PropTypes.node,
@@ -18,28 +23,25 @@ class DefaultHeader extends Component {
   render() {
 
     // eslint-disable-next-line
-    const { children, ...attributes } = this.props;
+    const {children, ...attributes} = this.props;
 
     return (
       <React.Fragment>
-        <AppSidebarToggler className="d-lg-none" display="md" mobile />
-        <AppNavbarBrand
-          full={{ src: logo, width: 89, height: 25, alt: 'CoreUI Logo' }}
-          minimized={{ src: sygnet, width: 30, height: 30, alt: 'CoreUI Logo' }}
-        />
-        <AppSidebarToggler className="d-md-down-none" display="lg" />
+        <AppSidebarToggler className="d-lg-none" display="md" mobile/>
+        <span className="navbar-brand">
+          <img src={logo} width="32" height="35" alt="Omni Data Bank" />
+          <FormattedMessage id="Omni Data Bank"/>
+        </span>
         <Nav className="ml-auto" navbar>
           <AppHeaderDropdown>
             <DropdownToggle nav>
-              <img src={avatar} className="img-avatar" alt="admin@bootstrapmaster.com" />
+              <img src={this.props.profileImage} className="img-avatar" alt={this.props.label}/>
             </DropdownToggle>
-            <DropdownMenu right style={{ right: 'auto', height: '400px' }}>
-              AppHeaderDropdown
+            <DropdownMenu right style={{right: 'auto', height: 'auto'}}>
+              <DropdownItem tag={Link} to="/logout"><FormattedMessage id="Logout"/></DropdownItem>
             </DropdownMenu>
           </AppHeaderDropdown>
         </Nav>
-        <AppAsideToggler className="d-md-down-none" />
-        {/*<AppAsideToggler className="d-lg-none" mobile />*/}
       </React.Fragment>
     );
   }
@@ -48,4 +50,15 @@ class DefaultHeader extends Component {
 DefaultHeader.propTypes = propTypes;
 DefaultHeader.defaultProps = defaultProps;
 
-export default DefaultHeader;
+const mapStateToProps = (state, ownProps) => {
+  let newState = Object.assign({}, state);
+  if (state.me && state.me.email) {
+    newState.label = state.me.label;
+    newState.profileImage = '//www.gravatar.com/avatar.php?gravatar_id=' + md5(state.me.email);
+  }
+  return newState;
+};
+
+export default connect(
+  mapStateToProps,
+)(DefaultHeader);
